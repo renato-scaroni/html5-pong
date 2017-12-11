@@ -1,122 +1,200 @@
-require(['phaser.min','ball'],function(Phaser,Player,Level,HUD){
-    var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
-    function preload() 
-    {
-        game.load.image('courtGfx', 'assets/sprites/court.png');
-        game.load.image('leftPaddleGfx', 'assets/sprites/paddle-blue.png');
-        game.load.image('rightPaddleGfx', 'assets/sprites/paddle-green.png');
+function preload() 
+{
+    game.load.image('courtGfx', 'assets/sprites/court.png');
+    game.load.image('leftPaddleGfx', 'assets/sprites/paddle-blue.png');
+    game.load.image('rightPaddleGfx', 'assets/sprites/paddle-green.png');
+    game.load.image('ballGfx', 'assets/sprites/ball.png');
+}
+
+// Hud
+var score = 0;
+var scoreText;
+
+// Game elements
+var leftPaddle;
+var rightPaddle;
+var ball;
+
+// Input
+var cursors;
+var leftPlayerInput;
+var rightPlayerInput;
+
+var movementDirection = 
+{
+    up: 1,
+    down: 2,
+    none: 3
+}
+
+function setBallMovement(ball, direction)
+{
+    ball.ballDirection = ballDirection = {
+        x: direction.x,
+        y: direction.y
     }
 
-    // Hud
-    var score = 0;
-    var scoreText;
+    ball.body.velocity.x = 150 * ball.ballDirection.x;
+    ball.body.velocity.y = 150 * ball.ballDirection.y;
+}
 
-    // Game elements
-    var leftPaddle;
-    var rightPaddle;
+function initializePaddle(position, gfxName)
+{
+    var paddle = game.add.sprite(position.x, position.y, gfxName);
+    game.physics.arcade.enable(paddle);
+    paddle.body.collideWorldBounds = true;
 
-    // Input
-    var cursors;
-    var leftPlayerInput;
-    var rightPlayerInput;
+    return paddle;
+}
 
-    var movementDirection = 
+var paddlePosition = 
+{
+    right: 1,
+    left: 2
+}
+
+function create() {
+
+    //  We're going to be using physics, so enable the Arcade Physics system
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+
+    // Set court background
+    game.add.sprite(0, 0, 'courtGfx');
+
+    // The player and its settings
+    leftPaddle = initializePaddle({x: 16, y: game.world.height/2}, 'leftPaddleGfx');
+    leftPaddle.paddlePosition = paddlePosition.left;
+
+    rightPaddle = initializePaddle({x: game.world.width - 48, y: game.world.height/2}, 'rightPaddleGfx');
+    leftPaddle.paddlePosition = paddlePosition.right;
+
+    // Initialize ball
+    ball = game.add.sprite(game.world.width/2 -16, game.world.height/2, 'ballGfx');
+    game.physics.arcade.enable(ball);
+    ball.body.bounce = 1;
+    ball.body.collideWorldBounds = true;
+
+    //  The score
+    scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+
+    //  Our controls.
+    cursors = game.input.keyboard.createCursorKeys();
+    leftPlayerInput =
     {
-        up: 1,
-        down: 2,
-        none: 3
+        down: cursors.down,
+        up: cursors.up
+    };
+
+    rightPlayerInput =
+    {
+        down: cursors.left,
+        up: cursors.right
+    };    
+
+    setBallMovement(ball, {x: -1, y: 0});
+}
+
+function movePaddle(paddle, direction)
+{
+    paddle.body.velocity.y = 0;
+    
+    switch(direction) 
+    {
+        case movementDirection.up:
+            paddle.body.velocity.y = -150;
+            break;
+        case movementDirection.down:
+            paddle.body.velocity.y = 150;
+            break;
     }
 
+}
 
-    function initializePaddle(position, gfxName)
+function handlePlayerInput(paddle, inputButtons)
+{
+    if (inputButtons.up.isDown)
     {
-        var paddle = game.add.sprite(position.x, position.y, gfxName);
-        game.physics.arcade.enable(paddle);
-        paddle.body.collideWorldBounds = true;
+        movePaddle(paddle, movementDirection.up);
+    }
+    else if (inputButtons.down.isDown)
+    {
+        movePaddle(paddle, movementDirection.down);
+    }
+    else
+    {
+        movePaddle(paddle, movementDirection.none);
+    }
+}
 
-        return paddle;
+function update() 
+{
+    handleBallCollisions();
+
+    // handle left player's movement
+    handlePlayerInput(leftPaddle, leftPlayerInput);
+    
+    // handle other pad (need to decide how)
+    handlePlayerInput(rightPaddle, rightPlayerInput);
+
+}
+
+function handleBallCollisions()
+{
+    // check for collisions
+    game.physics.arcade.collide(ball, leftPaddle, reflectBallDirection, null, this);
+    game.physics.arcade.collide(ball, rightPaddle, reflectBallDirection, null, this);
+
+    // check if ball hit the wall
+    if(ball.body.onWall())
+    {
+        // Give point to a player
+        // Update Hud
+        console.log("ball on the wall");
     }
 
-    var paddlePosition = 
+    if(ball.body.onFloor() || ball.body.onCeiling())
     {
-        right: 1,
-        left: 2
+        reflectBallDirection(ball, null);
     }
+}
 
-    function create() {
+function rotateVector(vector, degrees)
+{
+    var radians = degrees * (Math.PI/180)
 
-        //  We're going to be using physics, so enable the Arcade Physics system
-        game.physics.startSystem(Phaser.Physics.ARCADE);
+    return {
+        x: vector.x * Math.cos(radians) - vector.y * Math.sin(radians),
+        y: vector.x * Math.sin(radians) + vector.y * Math.cos(radians)
+    };
+}
 
-        // Set court background
-        game.add.sprite(0, 0, 'courtGfx');
-
-        // The player and its settings
-        leftPaddle = initializePaddle({x: 16, y: game.world.height/2}, 'leftPaddleGfx');
-        leftPaddle.paddlePosition = paddlePosition.left;
-
-        rightPaddle = initializePaddle({x: game.world.width - 48, y: game.world.height/2}, 'rightPaddleGfx');
-        leftPaddle.paddlePosition = paddlePosition.right;
-
-
-        //  The score
-        scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-
-        //  Our controls.
-        cursors = game.input.keyboard.createCursorKeys();
-        leftPlayerInput =
+function reflectBallDirection (ball, paddle) 
+{
+    if(ball != null && paddle != null)
+    {
+        console.log(ball);
+        console.log(paddle.paddlePosition);
+        console.log("ball hit paddle");
+        if(paddle.paddlePosition == paddlePosition.left)
         {
-            down: cursors.down,
-            up: cursors.up
-        };
-
-        rightPlayerInput =
-        {
-            down: cursors.left,
-            up: cursors.right
-        };    
-    }
-
-    function movePaddle(paddle, direction)
-    {
-        paddle.body.velocity.y = 0;
-        
-        switch(direction) 
-        {
-            case movementDirection.up:
-                paddle.body.velocity.y = -150;
-                break;
-            case movementDirection.down:
-                paddle.body.velocity.y = 150;
-                break;
-        }
-
-    }
-
-    function handlePlayerInput(paddle, inputButtons)
-    {
-        if (inputButtons.up.isDown)
-        {
-            movePaddle(paddle, movementDirection.up);
-        }
-        else if (inputButtons.down.isDown)
-        {
-            movePaddle(paddle, movementDirection.down);
+            setBallMovement(ball, rotateVector(ball.ballDirection, -90));
         }
         else
         {
-            movePaddle(paddle, movementDirection.none);
+            setBallMovement(ball, rotateVector(ball.ballDirection, 90));
         }
     }
-
-    function update() 
+    else
     {
-
-        // handle left player's movement
-        handlePlayerInput(leftPaddle, leftPlayerInput);
-        
-        // handle other pad (need to decide how)
-        handlePlayerInput(rightPaddle, rightPlayerInput);
+        if(ball.ballDirection.x > 0)
+        {
+            setBallMovement(ball, rotateVector(ball.ballDirection, -90)); 
+        }
+        else
+        {
+            setBallMovement(ball, rotateVector(ball.ballDirection, 90));
+        }
     }
-});
+}
