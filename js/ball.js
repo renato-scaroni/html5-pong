@@ -1,12 +1,14 @@
 /*
 Ball module
 */
-define([''],function(leftPaddle,rightPaddle) {
+define(['Constants'], function(Constants) {
 
     //Private variables
     var _game = null,
         _sprite = null,
-        _cursors = null;
+        _cursors = null,
+        _leftPaddle = null,
+        _rightPaddle = null;
 
     //Private functions
     function setBallMovement(ball, direction)
@@ -27,7 +29,7 @@ define([''],function(leftPaddle,rightPaddle) {
             console.log(ball);
             console.log(paddle.paddlePosition);
             console.log("ball hit paddle");
-            if(paddle.paddlePosition == paddlePosition.left)
+            if(paddle.paddlePosition == Constants.paddlePosition.left)
             {
                 setBallMovement(ball, rotateVector(ball.ballDirection, -90));
             }
@@ -52,15 +54,13 @@ define([''],function(leftPaddle,rightPaddle) {
     function handleBallCollisions()
     {
         // check for collisions
-        _game.physics.arcade.collide(_sprite, leftPaddle, reflectBallDirection, null, this);
-        _game.physics.arcade.collide(_sprite, rightPaddle, reflectBallDirection, null, this);
+        _game.physics.arcade.collide(_sprite, _leftPaddle, reflectBallDirection, null, this);
+        _game.physics.arcade.collide(_sprite, _rightPaddle, reflectBallDirection, null, this);
     
         // check if ball hit the wall
         if(_sprite.body.onWall())
         {
-            // Give point to a player
-            // Update Hud
-            console.log("ball on the wall");
+            resetBallMovement();
         }
     
         if(_sprite.body.onFloor() || _sprite.body.onCeiling())
@@ -81,8 +81,10 @@ define([''],function(leftPaddle,rightPaddle) {
     
     function resetBallMovement()
     {
-        // need to refactor this part, _sprite should not be ball sinonim
+        // remember to reset balls rotation
         setBallMovement(_sprite, {x: -1, y: 0});
+        _sprite.position.x = _game.world.width/2 -16;
+        _sprite.position.y = _game.world.height/2;
     }
 
     //public functions
@@ -98,9 +100,14 @@ define([''],function(leftPaddle,rightPaddle) {
             _game.physics.arcade.enable(_sprite);
             _sprite.body.bounce = 1;
             _sprite.body.collideWorldBounds = true;
+            resetBallMovement();
         },
         update: function(){
             handleBallCollisions();
+        },
+        setPaddles: function(leftPaddle,rightPaddle) {
+            _leftPaddle = leftPaddle;
+            _rightPaddle = rightPaddle
         }
 
     }
