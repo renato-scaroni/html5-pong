@@ -1,9 +1,9 @@
 requirejs.config({
     baseUrl: 'js',
     paths: {
-        Phaser: 'phaser.min',
-        Ball: 'ball',
-        Constants: 'constants'
+        Phaser: 'lib/phaser.min',
+        Ball: 'gameModules/ball',
+        Constants: 'gameModules/constants'
     }
 });
 
