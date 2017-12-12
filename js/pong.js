@@ -3,17 +3,13 @@ requirejs.config({
     paths: {
         Phaser: 'lib/phaser.min',
         Ball: 'gameModules/ball',
-        Constants: 'gameModules/constants'
+        Constants: 'gameModules/constants',
+        Score: 'gameModules/score'
     }
 });
 
-require(['Phaser', 'Ball', 'Constants'],function(Phaser, Ball, Constants){
+require(['Phaser', 'Ball', 'Constants', 'Score'],function(Phaser, Ball, Constants, Score){
     var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
-
-    
-    // Hud
-    var score = 0;
-    var scoreText;
     
     // Game elements
     var leftPaddle;
@@ -43,6 +39,8 @@ require(['Phaser', 'Ball', 'Constants'],function(Phaser, Ball, Constants){
 
         Ball.init(game);    
         Ball.preload();
+
+        Score.init(game);
     }
 
     function create() {
@@ -61,9 +59,8 @@ require(['Phaser', 'Ball', 'Constants'],function(Phaser, Ball, Constants){
         rightPaddle.paddlePosition = Constants.paddlePosition.right;
         rightPaddle.body.immovable = true;
         
-        //  The score
-        // TODO: encapsulate HUD
-        scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+        // The score
+        Score.create();
 
         // Game Inputs
         // TODO: move game input inplementation

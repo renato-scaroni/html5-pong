@@ -2,7 +2,7 @@
 Ball module
 Dependencies: Constants
 */
-define(['Constants'], function(Constants) {
+define(['Constants', 'Score'], function(Constants, Score) {
 
     //Private variables
     var _game = null,
@@ -42,7 +42,15 @@ define(['Constants'], function(Constants) {
         // checks if ball hit the wall
         if(_sprite.body.onWall())
         {
-            // TODO: update score
+            if(_sprite.x < _game.scale.viewportWidth)
+            {
+                Score.incrementRightScore();
+            }
+            else
+            {
+                Score.incrementLeftScore();
+            }
+
             resetBallMovement();
         }
     }
@@ -81,10 +89,14 @@ define(['Constants'], function(Constants) {
             _sprite.body.bounce.x = .95;
             _sprite.body.bounce.y = .95;
             _sprite.body.collideWorldBounds = true;
+            _sprite.body.onWorldBounds = new Phaser.Signal();
+
             resetBallMovement();
         },
         update: function(){
             handleBallCollisions();
+
+            console.log(_sprite.x);
         },
         setPaddles: function(leftPaddle,rightPaddle) {
             _leftPaddle = leftPaddle;
