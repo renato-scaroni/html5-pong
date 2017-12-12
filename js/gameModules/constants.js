@@ -9,6 +9,10 @@ define(function() {
         paddlePosition: {
             right: 1,
             left: 2
+        },
+        ballDirection: {
+            right: 1,
+            left: -1   
         }
     }
 });

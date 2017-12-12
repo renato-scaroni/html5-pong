@@ -9,64 +9,41 @@ define(['Constants'], function(Constants) {
         _sprite = null,
         _cursors = null,
         _leftPaddle = null,
-        _rightPaddle = null;
+        _rightPaddle = null,
+        _baseBallSpeed = 150,
+        _ballSpeed = 150;
 
     //Private functions
-    function setBallMovement(ball, direction)
+    function setBallMovement(ball, direction, targetBallSpeed = _baseBallSpeed)
     {
         ball.ballDirection = ballDirection = {
             x: direction.x,
             y: direction.y
         }
     
-        ball.body.velocity.x = 150 * ball.ballDirection.x;
-        ball.body.velocity.y = 150 * ball.ballDirection.y;
+        ball.body.velocity.x = targetBallSpeed * ball.ballDirection.x;
+        ball.body.velocity.y = targetBallSpeed * ball.ballDirection.y;
     }
 
-    function reflectBallDirection (ball, paddle) 
+    function handlePaddleCollision (ball, paddle) 
     {
         if(ball != null && paddle != null)
         {
-            console.log(ball);
-            console.log(paddle.paddlePosition);
-            console.log("ball hit paddle");
-            if(paddle.paddlePosition == Constants.paddlePosition.left)
-            {
-                setBallMovement(ball, rotateVector(ball.ballDirection, -90));
-            }
-            else
-            {
-                setBallMovement(ball, rotateVector(ball.ballDirection, 90));
-            }
-        }
-        else
-        {
-            if(ball.ballDirection.x > 0)
-            {
-                setBallMovement(ball, rotateVector(ball.ballDirection, -90)); 
-            }
-            else
-            {
-                setBallMovement(ball, rotateVector(ball.ballDirection, 90));
-            }
+            // TODO: apply modifiers according  to paddle movement
         }
     }
     
     function handleBallCollisions()
     {
-        // check for collisions
-        _game.physics.arcade.collide(_sprite, _leftPaddle, reflectBallDirection, null, this);
-        _game.physics.arcade.collide(_sprite, _rightPaddle, reflectBallDirection, null, this);
+        // checks for collisions
+        _game.physics.arcade.collide(_sprite, _leftPaddle, handlePaddleCollision, null, this);
+        _game.physics.arcade.collide(_sprite, _rightPaddle, handlePaddleCollision, null, this);
     
-        // check if ball hit the wall
+        // checks if ball hit the wall
         if(_sprite.body.onWall())
         {
+            // TODO: update score
             resetBallMovement();
-        }
-    
-        if(_sprite.body.onFloor() || _sprite.body.onCeiling())
-        {
-            reflectBallDirection(_sprite, null);
         }
     }
     
@@ -80,11 +57,13 @@ define(['Constants'], function(Constants) {
         };
     }
     
-    function resetBallMovement()
+    function resetBallMovement(xDirection = Constants.ballDirection.right)
     {
         // remember to reset balls rotation
-        setBallMovement(_sprite, {x: -1, y: 0});
-        _sprite.position.x = _game.world.width/2 -16;
+        var randomRotation = _game.rnd.integerInRange(-60, 60);
+        var movementVector = rotateVector({x: xDirection, y: 0}, randomRotation);
+        setBallMovement(_sprite, movementVector, );
+        _sprite.position.x = _game.world.width/2 - _sprite.body.halfWidth;
         _sprite.position.y = _game.world.height/2;
     }
 
@@ -99,7 +78,8 @@ define(['Constants'], function(Constants) {
         create: function() {
             _sprite = _game.add.sprite(_game.world.width/2 -16, _game.world.height/2, 'ballGfx');
             _game.physics.arcade.enable(_sprite);
-            _sprite.body.bounce = 1;
+            _sprite.body.bounce.x = .95;
+            _sprite.body.bounce.y = .95;
             _sprite.body.collideWorldBounds = true;
             resetBallMovement();
         },

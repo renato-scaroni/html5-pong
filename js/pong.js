@@ -36,32 +36,37 @@ require(['Phaser', 'Ball', 'Constants'],function(Phaser, Ball, Constants){
     function preload() 
     {
         game.load.image('courtGfx', 'assets/sprites/court.png');
+
+        // TODO: encapsulate paddles
         game.load.image('leftPaddleGfx', 'assets/sprites/paddle-blue.png');
         game.load.image('rightPaddleGfx', 'assets/sprites/paddle-green.png');
+
         Ball.init(game);    
         Ball.preload();
     }
 
     function create() {
-        
         //  We're going to be using physics, so enable the Arcade Physics system
         game.physics.startSystem(Phaser.Physics.ARCADE);
         
         // Set court background
         game.add.sprite(0, 0, 'courtGfx');
         
-        // The player and its settings
+        // Paddles initialization
+        // TODO: encapsulate paddles
         leftPaddle = initializePaddle({x: 16, y: game.world.height/2}, 'leftPaddleGfx');
         leftPaddle.paddlePosition = Constants.paddlePosition.left;
-        
+        leftPaddle.body.immovable = true;
         rightPaddle = initializePaddle({x: game.world.width - 48, y: game.world.height/2}, 'rightPaddleGfx');
-        leftPaddle.paddlePosition = Constants.paddlePosition.right;
-        
+        rightPaddle.paddlePosition = Constants.paddlePosition.right;
+        rightPaddle.body.immovable = true;
         
         //  The score
+        // TODO: encapsulate HUD
         scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
-        //  Our controls.
+        // Game Inputs
+        // TODO: move game input inplementation
         cursors = game.input.keyboard.createCursorKeys();
         leftPlayerInput =
         {
@@ -118,7 +123,8 @@ require(['Phaser', 'Ball', 'Constants'],function(Phaser, Ball, Constants){
         // handle left player's movement
         handlePlayerInput(leftPaddle, leftPlayerInput);
         
-        // handle other pad (need to decide how)
+        // handle other pad
+        // TODO: implement AI
         handlePlayerInput(rightPaddle, rightPlayerInput);
     }
 });
