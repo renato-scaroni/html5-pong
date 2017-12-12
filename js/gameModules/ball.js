@@ -95,8 +95,6 @@ define(['Constants', 'Score'], function(Constants, Score) {
         },
         update: function(){
             handleBallCollisions();
-
-            console.log(_sprite.x);
         },
         setPaddles: function(leftPaddle,rightPaddle) {
             _leftPaddle = leftPaddle;
