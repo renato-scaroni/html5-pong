@@ -13,6 +13,8 @@ define(function() {
         ballDirection: {
             right: 1,
             left: -1   
-        }
+        },
+        screenWidth: 800,
+        screenHeight: 600
     }
 });

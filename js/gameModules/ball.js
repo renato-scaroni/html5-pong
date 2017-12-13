@@ -7,7 +7,6 @@ define(['Constants', 'Score'], function(Constants, Score) {
     //Private variables
     var _game = null,
         _sprite = null,
-        _cursors = null,
         _leftPaddle = null,
         _rightPaddle = null,
         _baseBallSpeed = 150,
@@ -42,7 +41,7 @@ define(['Constants', 'Score'], function(Constants, Score) {
         // checks if ball hit the wall
         if(_sprite.body.onWall())
         {
-            if(_sprite.x < _game.scale.viewportWidth)
+            if(_sprite.x < Constants.screenwidth/2)
             {
                 Score.incrementRightScore();
             }

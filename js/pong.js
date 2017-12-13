@@ -4,14 +4,18 @@ requirejs.config({
         Phaser: 'lib/phaser.min',
         Ball: 'gameModules/ball',
         Constants: 'gameModules/constants',
-        Score: 'gameModules/score'
+        Score: 'gameModules/score',
+        Paddle: 'gameModules/paddle'
     }
 });
 
-require(['Phaser', 'Ball', 'Constants', 'Score'],function(Phaser, Ball, Constants, Score){
-    var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+require(['Phaser', 'Ball', 'Constants', 'Score', 'Paddle'],function(Phaser, Ball, Constants, Score){
+    var game = new Phaser.Game(Constants.screenWidth, Constants.screenHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
     
     // Game elements
+    var leftPaddleObject;
+    var rightPaddleObject;
+
     var leftPaddle;
     var rightPaddle;
     
@@ -19,23 +23,15 @@ require(['Phaser', 'Ball', 'Constants', 'Score'],function(Phaser, Ball, Constant
     var cursors;
     var leftPlayerInput;
     var rightPlayerInput;    
-    
-    function initializePaddle(position, gfxName)
-    {
-        var paddle = game.add.sprite(position.x, position.y, gfxName);
-        game.physics.arcade.enable(paddle);
-        paddle.body.collideWorldBounds = true;
-        
-        return paddle;
-    }
-        
+            
     function preload() 
     {
         game.load.image('courtGfx', 'assets/sprites/court.png');
 
-        // TODO: encapsulate paddles
-        game.load.image('leftPaddleGfx', 'assets/sprites/paddle-blue.png');
-        game.load.image('rightPaddleGfx', 'assets/sprites/paddle-green.png');
+        leftPaddleObject = new Paddle('leftPaddleGfx', 'assets/sprites/paddle-blue.png');
+        rightPaddleObject = new Paddle('rightPaddleGfx', 'assets/sprites/paddle-green.png');
+        leftPaddleObject.preload();
+        rightPaddleObject.preload();
 
         Ball.init(game);    
         Ball.preload();
@@ -51,13 +47,8 @@ require(['Phaser', 'Ball', 'Constants', 'Score'],function(Phaser, Ball, Constant
         game.add.sprite(0, 0, 'courtGfx');
         
         // Paddles initialization
-        // TODO: encapsulate paddles
-        leftPaddle = initializePaddle({x: 16, y: game.world.height/2}, 'leftPaddleGfx');
-        leftPaddle.paddlePosition = Constants.paddlePosition.left;
-        leftPaddle.body.immovable = true;
-        rightPaddle = initializePaddle({x: game.world.width - 48, y: game.world.height/2}, 'rightPaddleGfx');
-        rightPaddle.paddlePosition = Constants.paddlePosition.right;
-        rightPaddle.body.immovable = true;
+        leftPaddle = leftPaddleObject.create({x: 16, y: game.world.height/2});
+        rightPaddle = rightPaddleObject.create({x: game.world.width - 48, y: game.world.height/2});
         
         // The score
         Score.create();
