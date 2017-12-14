@@ -1,5 +1,6 @@
 /*
 Ball module
+Singleton class that controls the Ball
 Dependencies: Constants
 */
 define(['Constants', 'Score'], function(Constants, Score) {

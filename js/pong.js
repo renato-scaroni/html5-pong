@@ -1,3 +1,6 @@
+/*
+Game main class, control game scene elements
+*/
 requirejs.config({
     baseUrl: 'js',
     paths: {
@@ -5,33 +8,35 @@ requirejs.config({
         Ball: 'gameModules/ball',
         Constants: 'gameModules/constants',
         Score: 'gameModules/score',
-        Paddle: 'gameModules/paddle'
+        Paddle: 'gameModules/paddle',
+        PaddleInputController: 'gameModules/paddleInputController'
     }
 });
 
-require(['Phaser', 'Ball', 'Constants', 'Score', 'Paddle'],function(Phaser, Ball, Constants, Score){
+require(['Phaser', 'Ball', 'Constants', 'Score', 'Paddle', 'PaddleInputController'],function(){
+    // Importing library
+    Paddle = require('Paddle');
+    PaddleInputController = require('PaddleInputController');
+    Phaser = require('Phaser');
+    Ball = require('Ball');
+    Constants = require('Constants');
+    Score = require('Score');
+
+    // Create game instance
     var game = new Phaser.Game(Constants.screenWidth, Constants.screenHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
     
     // Game elements
     var leftPaddleObject;
     var rightPaddleObject;
 
-    var leftPaddle;
-    var rightPaddle;
-    
-    // Input
-    var cursors;
-    var leftPlayerInput;
-    var rightPlayerInput;    
-            
     function preload() 
     {
         game.load.image('courtGfx', 'assets/sprites/court.png');
 
         leftPaddleObject = new Paddle('leftPaddleGfx', 'assets/sprites/paddle-blue.png');
         rightPaddleObject = new Paddle('rightPaddleGfx', 'assets/sprites/paddle-green.png');
-        leftPaddleObject.preload();
-        rightPaddleObject.preload();
+        leftPaddleObject.preload(game);
+        rightPaddleObject.preload(game);
 
         Ball.init(game);    
         Ball.preload();
@@ -47,72 +52,32 @@ require(['Phaser', 'Ball', 'Constants', 'Score', 'Paddle'],function(Phaser, Ball
         game.add.sprite(0, 0, 'courtGfx');
         
         // Paddles initialization
-        leftPaddle = leftPaddleObject.create({x: 16, y: game.world.height/2});
-        rightPaddle = rightPaddleObject.create({x: game.world.width - 48, y: game.world.height/2});
+        leftPaddleObject.create({x: 16, y: game.world.height/2});
+        rightPaddleObject.create({x: game.world.width - 48, y: game.world.height/2});
         
         // The score
         Score.create();
 
         // Game Inputs
-        // TODO: move game input inplementation
-        cursors = game.input.keyboard.createCursorKeys();
+        var cursors = game.input.keyboard.createCursorKeys();
         leftPlayerInput =
         {
             down: cursors.down,
             up: cursors.up
         };
+        var paddleInputController = new PaddleInputController(leftPlayerInput);
+        leftPaddleObject.setMovementController(paddleInputController);
 
-        rightPlayerInput =
-        {
-            down: cursors.left,
-            up: cursors.right
-        };
-
+        // Ball
         Ball.create();
-        Ball.setPaddles(leftPaddle, rightPaddle);
-    }
-
-    function movePaddle(paddle, direction)
-    {
-        paddle.body.velocity.y = 0;
-        
-        switch(direction) 
-        {
-            case Constants.movementDirection.up:
-                paddle.body.velocity.y = -150;
-                break;
-            case Constants.movementDirection.down:
-                paddle.body.velocity.y = 150;
-                break;
-        }
-
-    }
-
-    function handlePlayerInput(paddle, inputButtons)
-    {
-        if (inputButtons.up.isDown)
-        {
-            movePaddle(paddle, Constants.movementDirection.up);
-        }
-        else if (inputButtons.down.isDown)
-        {
-            movePaddle(paddle, Constants.movementDirection.down);
-        }
-        else
-        {
-            movePaddle(paddle, Constants.movementDirection.none);
-        }
+        Ball.setPaddles(leftPaddleObject.getSprite(), rightPaddleObject.getSprite());
     }
 
     function update() 
     {
         Ball.update();
 
-        // handle left player's movement
-        handlePlayerInput(leftPaddle, leftPlayerInput);
-        
-        // handle other pad
-        // TODO: implement AI
-        handlePlayerInput(rightPaddle, rightPlayerInput);
+        leftPaddleObject.update();
+        rightPaddleObject.update();
     }
 });

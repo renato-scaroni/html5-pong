@@ -27,16 +27,39 @@ define(['Constants'], function(Constants) {
         create: function(position) {
             this._paddlePosition = position;
             this._sprite = _game.add.sprite(position.x, position.y, this._spriteName);
-            game.physics.arcade.enable(this._sprite);
+            this._game.physics.arcade.enable(this._sprite);
             this._sprite.body.collideWorldBounds = true;
             this._sprite.body.immovable = true;
             return this._sprite;
         },
         update: function(){
-
+            if(this._movementController != null)
+            {
+                this._movementController.update();
+            }
         },
         getSprite: function() {
             return this._sprite;
+        },
+        setMovementController: function(movementController)
+        {
+            this._movementController = movementController;
+            movementController.setPaddle(this);
+        },
+        movePaddle: function (direction)
+        {
+            this._sprite.body.velocity.y = 0;
+            
+            switch(direction) 
+            {
+                case Constants.movementDirection.up:
+                    this._sprite.body.velocity.y = -150;
+                    break;
+                case Constants.movementDirection.down:
+                    this._sprite.body.velocity.y = 150;
+                    break;
+            }
+    
         }
     };
 
