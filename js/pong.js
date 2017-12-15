@@ -61,11 +61,13 @@ require(['Phaser', 'Ball', 'Constants', 'Score', 'Paddle', 'PaddleInputControlle
         Score.create();
 
         // Game Inputs
+        var cursors = game.input.keyboard.createCursorKeys();
         leftPlayerInput =
         {
-            down: Phaser.Keyboard.UP,
-            up: Phaser.Keyboard.DOWN
+            down: cursors.down,
+            up: cursors.up  
         };
+  
         var paddleInputController = new PaddleInputController(leftPlayerInput);
         leftPaddleObject.setMovementController(paddleInputController);
         
