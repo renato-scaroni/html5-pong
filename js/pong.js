@@ -61,11 +61,10 @@ require(['Phaser', 'Ball', 'Constants', 'Score', 'Paddle', 'PaddleInputControlle
         Score.create();
 
         // Game Inputs
-        var cursors = game.input.keyboard.createCursorKeys();
         leftPlayerInput =
         {
-            down: cursors.down,
-            up: cursors.up
+            down: Phaser.Keyboard.UP,
+            up: Phaser.Keyboard.DOWN
         };
         var paddleInputController = new PaddleInputController(leftPlayerInput);
         leftPaddleObject.setMovementController(paddleInputController);
@@ -75,7 +74,7 @@ require(['Phaser', 'Ball', 'Constants', 'Score', 'Paddle', 'PaddleInputControlle
         Ball.setPaddles(leftPaddleObject.getSprite(), rightPaddleObject.getSprite());
 
         // Initialize AI player
-        var paddleAIController = new PaddleAIController(leftPlayerInput);
+        var paddleAIController = new PaddleAIController();
         rightPaddleObject.setMovementController(paddleAIController);        
 
     }

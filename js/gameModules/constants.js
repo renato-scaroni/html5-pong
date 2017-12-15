@@ -16,6 +16,14 @@ define(function() {
         },
         screenWidth: 800,
         screenHeight: 600,
-        defaultDistanceThreshold: .001
+        defaultDistanceThreshold: 10,
+
+        paddleSpeed: 300,
+        paddleSegmentsMax: 4,
+        paddleSegmentHeight: 4,
+        paddleSegmentAngle: 15,
+        
+        ballSpeed: 250
+    
     }
 });

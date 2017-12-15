@@ -53,10 +53,10 @@ define(['Constants'], function(Constants) {
             switch(direction) 
             {
                 case Constants.movementDirection.up:
-                    this._sprite.body.velocity.y = -150;
+                    this._sprite.body.velocity.y = -Constants.paddleSpeed;
                     break;
                 case Constants.movementDirection.down:
-                    this._sprite.body.velocity.y = 150;
+                    this._sprite.body.velocity.y = Constants.paddleSpeed;;
                     break;
             }
     

@@ -10,12 +10,10 @@ define(['Constants', 'Score'], function(Constants, Score) {
         _sprite = null,
         _leftPaddle = null,
         _rightPaddle = null,
-        _baseBallSpeed = 150,
-        _ballSpeed = 150,
         _ballDirection = null;
 
     //Private functions
-    function setBallMovement(ball, direction, targetBallSpeed = _baseBallSpeed)
+    function setBallMovement(ball, direction, targetBallSpeed = Constants.ballSpeed)
     {
         ball.body.velocity.x = targetBallSpeed * direction.x;
         ball.body.velocity.y = targetBallSpeed * direction.y;
@@ -25,7 +23,35 @@ define(['Constants', 'Score'], function(Constants, Score) {
     {
         if(ball != null && paddle != null)
         {
-            // TODO: apply modifiers according  to paddle movement
+            // The paddles were sgmented in 4 possible segments, in which the collision 
+            // implies on a movement direction to be modified
+            var returnAngle;
+            var segmentHit = Math.floor((ball.y - paddle.y)/Constants.paddleSegmentHeight);
+            
+            if (segmentHit >= Constants.paddleSegmentsMax) 
+            {
+                segmentHit = Constants.paddleSegmentsMax - 1;
+            } 
+            else if (segmentHit <= -Constants.paddleSegmentsMax) 
+            {
+                segmentHit = -(Constants.paddleSegmentsMax - 1);
+            }
+            
+            if (paddle.x < Constants.screenWidth * 0.5) 
+            {
+                returnAngle = segmentHit * Constants.paddleSegmentAngle;
+                _game.physics.arcade.velocityFromAngle(returnAngle, Constants.ballSpeed, _sprite.body.velocity);
+            } 
+            else 
+            {
+                returnAngle = 180 - (segmentHit * Constants.paddleSegmentAngle);
+                if (returnAngle > 180) 
+                {
+                    returnAngle -= 360;
+                }
+                
+                _game.physics.arcade.velocityFromAngle(returnAngle, Constants.ballSpeed, _sprite.body.velocity);
+            }
         }
     }
     
@@ -34,18 +60,16 @@ define(['Constants', 'Score'], function(Constants, Score) {
         // checks for collisions
         _game.physics.arcade.collide(_sprite, _leftPaddle, handlePaddleCollision, null, this);
         _game.physics.arcade.collide(_sprite, _rightPaddle, handlePaddleCollision, null, this);
-    
+    1
         // checks if ball hit the wall
         if(_sprite.body.onWall())
         {
             if(_sprite.x < _game.world.centerX)
             {
-                console.log("incrementing left score");
                 Score.incrementRightScore();
             }
             else
             {
-                console.log("incrementing right score");
                 Score.incrementLeftScore();
             }
 
@@ -84,10 +108,11 @@ define(['Constants', 'Score'], function(Constants, Score) {
         create: function() {
             _sprite = _game.add.sprite(_game.world.width/2 -16, _game.world.height/2, 'ballGfx');
             _game.physics.arcade.enable(_sprite);
-            _sprite.body.bounce.x = .95;
-            _sprite.body.bounce.y = .95;
+            _sprite.body.bounce.x = 1;
+            _sprite.body.bounce.y = 1;
+            _sprite.checkWorldBounds = true;
             _sprite.body.collideWorldBounds = true;
-            _sprite.body.onWorldBounds = new Phaser.Signal();
+            _sprite.body.immovable = true;
 
             resetBallMovement();
         },
