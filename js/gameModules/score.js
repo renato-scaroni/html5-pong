@@ -15,15 +15,34 @@ define(['Constants'], function(Constants) {
         _scoreTextHudObj.setText(_leftPlayerScore + _baseScoreText +  _rightPlayerScore);
     }
 
+    function gameFinished(playerScore)
+    {
+        return playerScore >= Constants.maxGameScore;
+    }
+
     //public methods
     return{
         incrementLeftScore: function(){
             _leftPlayerScore = _leftPlayerScore + 1;
             
+            console.log("updateing score left");
+
+            if(gameFinished(_leftPlayerScore))
+            {
+                _game.state.start('endGame');
+            }
+
             updateScoreText();
         },
         incrementRightScore: function(){
             _rightPlayerScore = _rightPlayerScore + 1;
+            console.log("updateing score roght");
+            console.log(gameFinished(_rightPlayerScore));
+
+            if(gameFinished(_rightPlayerScore))
+            {
+                _game.state.start('endGame');
+            }
             
             updateScoreText();
         },                  

@@ -10,82 +10,28 @@ requirejs.config({
         Score: 'gameModules/score',
         Paddle: 'gameModules/paddle',
         PaddleInputController: 'gameModules/paddleInputController',
-        PaddleAIController: 'gameModules/paddleAIController'
-    }
+        PaddleAIController: 'gameModules/paddleAIController',
+        MainGameState: 'gameModules/mainGameState',
+        NewGameState: 'gameModules/newGameState',
+        EndGameState: 'gameModules/endGameState',
+      }
 });
 
-require(['Phaser', 'Ball', 'Constants', 'Score', 'Paddle', 'PaddleInputController', 'PaddleAIController'],function(){
-    // Importing library
-    Paddle = require('Paddle');
-    PaddleInputController = require('PaddleInputController');
-    Phaser = require('Phaser');
-    Ball = require('Ball');
-    Constants = require('Constants');
-    Score = require('Score');
-    PaddleAIController = require('PaddleAIController');
+require(['MainGameState', 'NewGameState', 'EndGameState'],function(){
 
     // Create game instance
-    var game = new Phaser.Game(Constants.screenWidth, Constants.screenHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+    var game = new Phaser.Game(Constants.screenWidth, Constants.screenHeight, Phaser.AUTO, 'game');
     
-    // Game elements
-    var leftPaddleObject;
-    var rightPaddleObject;
+    var mainGameState = require('MainGameState');
+    var newGameState = require('NewGameState');
+    var endGameState = require('EndGameState');
+    
+    game.state.add('mainGame', mainGameState);
+    mainGameState._game = game;
+    game.state.add('newGame', newGameState);
+    newGameState._game = game;
+    game.state.add('endGame', endGameState);
+    endGameState._game = game;
 
-    function preload() 
-    {
-        game.load.image('courtGfx', 'assets/sprites/court.png');
-
-        leftPaddleObject = new Paddle('leftPaddleGfx', 'assets/sprites/paddle-blue.png');
-        rightPaddleObject = new Paddle('rightPaddleGfx', 'assets/sprites/paddle-green.png');
-        leftPaddleObject.preload(game);
-        rightPaddleObject.preload(game);
-
-        Ball.init(game);    
-        Ball.preload();
-
-        Score.init(game);
-    }
-
-    function create() {
-        //  We're going to be using physics, so enable the Arcade Physics system
-        game.physics.startSystem(Phaser.Physics.ARCADE);
-        
-        // Set court background
-        game.add.sprite(0, 0, 'courtGfx');
-        
-        // Paddles initialization
-        leftPaddleObject.create({x: 16, y: game.world.height/2});
-        rightPaddleObject.create({x: game.world.width - 48, y: game.world.height/2});
-        
-        // The score
-        Score.create();
-
-        // Game Inputs
-        var cursors = game.input.keyboard.createCursorKeys();
-        leftPlayerInput =
-        {
-            down: cursors.down,
-            up: cursors.up  
-        };
-  
-        var paddleInputController = new PaddleInputController(leftPlayerInput);
-        leftPaddleObject.setMovementController(paddleInputController);
-        
-        // Ball
-        Ball.create();
-        Ball.setPaddles(leftPaddleObject.getSprite(), rightPaddleObject.getSprite());
-
-        // Initialize AI player
-        var paddleAIController = new PaddleAIController();
-        rightPaddleObject.setMovementController(paddleAIController);        
-
-    }
-
-    function update() 
-    {
-        Ball.update();
-
-        leftPaddleObject.update();
-        rightPaddleObject.update();
-    }
+    game.state.start('newGame');
 });

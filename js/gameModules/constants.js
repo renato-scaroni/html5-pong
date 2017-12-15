@@ -23,7 +23,8 @@ define(function() {
         paddleSegmentHeight: 4,
         paddleSegmentAngle: 15,
         
-        ballSpeed: 250
-    
+        ballSpeed: 250,
+        
+        maxGameScore: 7
     }
 });
