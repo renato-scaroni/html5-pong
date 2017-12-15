@@ -38,12 +38,14 @@ define(['Constants', 'Score'], function(Constants, Score) {
         // checks if ball hit the wall
         if(_sprite.body.onWall())
         {
-            if(_sprite.x < Constants.screenwidth/2)
+            if(_sprite.x < _game.world.centerX)
             {
+                console.log("incrementing left score");
                 Score.incrementRightScore();
             }
             else
             {
+                console.log("incrementing right score");
                 Score.incrementLeftScore();
             }
 
