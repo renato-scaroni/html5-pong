@@ -15,13 +15,11 @@ define(['Constants'], function(Constants) {
         this._inputConfig = inputConfig;
     }
 
-    //private variables
+    // class definition
     PaddleInputController.prototype = {
         constructor: PaddleInputController,
         update: function()
         {
-            // console.log(this._inputConfig);
-            console.log(this);
             if (this._inputConfig.up.isDown)
             {
                 this._paddle.movePaddle(Constants.movementDirection.up);
@@ -35,7 +33,7 @@ define(['Constants'], function(Constants) {
                 this._paddle.movePaddle(Constants.movementDirection.none);
             }
         },
-        setPaddle: function(paddle)
+        init: function(paddle)
         {
             this._paddle = paddle;
         }

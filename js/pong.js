@@ -9,11 +9,12 @@ requirejs.config({
         Constants: 'gameModules/constants',
         Score: 'gameModules/score',
         Paddle: 'gameModules/paddle',
-        PaddleInputController: 'gameModules/paddleInputController'
+        PaddleInputController: 'gameModules/paddleInputController',
+        PaddleAIController: 'gameModules/paddleAIController'
     }
 });
 
-require(['Phaser', 'Ball', 'Constants', 'Score', 'Paddle', 'PaddleInputController'],function(){
+require(['Phaser', 'Ball', 'Constants', 'Score', 'Paddle', 'PaddleInputController', 'PaddleAIController'],function(){
     // Importing library
     Paddle = require('Paddle');
     PaddleInputController = require('PaddleInputController');
@@ -21,6 +22,7 @@ require(['Phaser', 'Ball', 'Constants', 'Score', 'Paddle', 'PaddleInputControlle
     Ball = require('Ball');
     Constants = require('Constants');
     Score = require('Score');
+    PaddleAIController = require('PaddleAIController');
 
     // Create game instance
     var game = new Phaser.Game(Constants.screenWidth, Constants.screenHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
@@ -67,10 +69,15 @@ require(['Phaser', 'Ball', 'Constants', 'Score', 'Paddle', 'PaddleInputControlle
         };
         var paddleInputController = new PaddleInputController(leftPlayerInput);
         leftPaddleObject.setMovementController(paddleInputController);
-
+        
         // Ball
         Ball.create();
         Ball.setPaddles(leftPaddleObject.getSprite(), rightPaddleObject.getSprite());
+
+        // Initialize AI player
+        var paddleAIController = new PaddleAIController(leftPlayerInput);
+        rightPaddleObject.setMovementController(paddleAIController);        
+
     }
 
     function update() 

@@ -11,18 +11,14 @@ define(['Constants', 'Score'], function(Constants, Score) {
         _leftPaddle = null,
         _rightPaddle = null,
         _baseBallSpeed = 150,
-        _ballSpeed = 150;
+        _ballSpeed = 150,
+        _ballDirection = null;
 
     //Private functions
     function setBallMovement(ball, direction, targetBallSpeed = _baseBallSpeed)
     {
-        ball.ballDirection = ballDirection = {
-            x: direction.x,
-            y: direction.y
-        }
-    
-        ball.body.velocity.x = targetBallSpeed * ball.ballDirection.x;
-        ball.body.velocity.y = targetBallSpeed * ball.ballDirection.y;
+        ball.body.velocity.x = targetBallSpeed * direction.x;
+        ball.body.velocity.y = targetBallSpeed * direction.y;
     }
 
     function handlePaddleCollision (ball, paddle) 
@@ -65,7 +61,7 @@ define(['Constants', 'Score'], function(Constants, Score) {
         };
     }
     
-    function resetBallMovement(xDirection = Constants.ballDirection.right)
+    function resetBallMovement(xDirection = Constants.ballDirection.left)
     {
         // remember to reset balls rotation
         var randomRotation = _game.rnd.integerInRange(-60, 60);
@@ -99,7 +95,14 @@ define(['Constants', 'Score'], function(Constants, Score) {
         setPaddles: function(leftPaddle,rightPaddle) {
             _leftPaddle = leftPaddle;
             _rightPaddle = rightPaddle
+        }, 
+        getSprite: function()
+        {
+            return _sprite;
+        },
+        getBallDirection: function()
+        {
+            return _sprite.body.velocity;
         }
-
     }
 });

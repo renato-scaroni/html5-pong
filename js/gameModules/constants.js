@@ -3,18 +3,19 @@ define(function() {
     return{
         movementDirection: {
             up: 1,
-            down: 2,
-            none: 3
+            down: -1,
+            none: 0
         },
         paddlePosition: {
             right: 1,
-            left: 2
+            left: -1
         },
         ballDirection: {
             right: 1,
             left: -1   
         },
         screenWidth: 800,
-        screenHeight: 600
+        screenHeight: 600,
+        defaultDistanceThreshold: .001
     }
 });

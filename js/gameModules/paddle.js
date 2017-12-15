@@ -44,7 +44,7 @@ define(['Constants'], function(Constants) {
         setMovementController: function(movementController)
         {
             this._movementController = movementController;
-            movementController.setPaddle(this);
+            movementController.init(this);
         },
         movePaddle: function (direction)
         {
@@ -60,6 +60,22 @@ define(['Constants'], function(Constants) {
                     break;
             }
     
+        },
+        paddleSide: function ()
+        {
+            if(this._side == null)
+            {
+                if(this._sprite.x > Constants.screenWidth/2)
+                {
+                    this._side = Constants.paddlePosition.right;
+                }
+                else
+                {
+                    this._side = Constants.paddlePosition.left;
+                }
+            }
+
+            return this._side;
         }
     };
 
